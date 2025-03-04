@@ -26,7 +26,7 @@ To set up the project on your local machine, follow the steps below:
 
 - Install [Node.js](https://nodejs.org/)
 - Install [npm](https://www.npmjs.com/) (Node Package Manager)
-
+ 
 ### Setup Instructions
 
 1. Clone the repository:
