@@ -1,0 +1,87 @@
+.login-container {
+    animation: slideUp 0.5s ease;
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .login-container input {
+    background: var(--light);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .login-container input:focus {
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+    border-color: var(--secondary);
+  }
+  
+  .login-container .input-group-text {
+    color: var(--primary);
+    background: var(--light);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: none;
+  }
+  
+  /* Dark Mode Overrides for Login */
+  [data-bs-theme="dark"] .login-container input,
+  [data-bs-theme="dark"] .login-container .input-group-text {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--light);
+  }
+  
+  [data-bs-theme="dark"] .login-container input:focus {
+    box-shadow: 0 0 0 3px rgba(255, 235, 109, 0.2);
+  }
+  
+  [data-bs-theme="dark"] .login-container {
+    color: var(--light);
+  }
+  /* Placeholder styling for dark mode */
+  [data-bs-theme="dark"] ::placeholder {
+    color: rgba(255, 255, 255, 0.6) !important;
+  }
+  
+  [data-bs-theme="dark"] .auth-form input::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+  }
+  
+  /* Auth form transitions */
+  .auth-form {
+    transition: all 0.3s ease;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .auth-form.d-none {
+    opacity: 0;
+    transform: translateY(10px);
+    display: none !important;
+  }
+  
+  /* Dark mode input overrides */
+  [data-bs-theme="dark"] .auth-form input {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--light);
+  }
+  
+  [data-bs-theme="dark"] .auth-form .input-group-text {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--primary);
+  }
+  
+  [data-bs-theme="dark"] .auth-form {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
