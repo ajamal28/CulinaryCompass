@@ -147,30 +147,34 @@ class RecipeApp {
         modalImage.src = recipe.image;
         sourceLink.href = recipe.sourceUrl;
     
-        // Format instructions
+        // Format instructions as bullet points
         const cleanedInstructions = recipe.instructions 
-          ? recipe.instructions.replace(/<\/?[^>]+(>|$)/g, "") 
-          : 'No instructions available';
+            ? recipe.instructions.replace(/<\/?[^>]+(>|$)/g, "").split('.').map(step => step.trim()).filter(step => step)
+            : ['No instructions available'];
         
-        instructions.innerHTML = `
-          <div class="bg-light p-3 rounded">${cleanedInstructions}</div>
+        const instructionsHTML = `
+            <ol class="bg-light p-3 rounded">
+                ${cleanedInstructions.map(step => `<li>${step}</li>`).join('')}
+            </ol>
         `;
+        
+        instructions.innerHTML = instructionsHTML;
     
         // Create nutrition grid
         const nutrients = recipe.nutrition.nutrients.slice(0, 4);
         const nutritionHTML = nutrients.map(nutrient => `
-          <div class="nutrition-item">
-            <div class="text-primary fw-bold">${nutrient.name}</div>
-            <div class="text-dark">${Math.round(nutrient.amount)}${nutrient.unit}</div>
-          </div>
+            <div class="nutrition-item">
+                <div class="text-primary fw-bold">${nutrient.name}</div>
+                <div class="text-dark">${Math.round(nutrient.amount)}${nutrient.unit}</div>
+            </div>
         `).join('');
     
         // Add cooking time
         nutritionList.innerHTML = nutritionHTML + `
-          <div class="nutrition-item">
-            <div class="text-primary fw-bold">Cook Time</div>
-            <div class="text-dark">${recipe.readyInMinutes} mins</div>
-          </div>
+            <div class="nutrition-item">
+                <div class="text-primary fw-bold">Cook Time</div>
+                <div class="text-dark">${recipe.readyInMinutes} mins</div>
+            </div>
         `;
     
         new bootstrap.Modal(modal).show();
