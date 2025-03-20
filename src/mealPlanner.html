@@ -372,6 +372,28 @@
         justify-content: space-around;
       }
     }
+
+    .recipe-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .add-recipe-btn {
+      background: var(--primary) !important;
+      color: white !important;
+      font-weight: 500;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .add-recipe-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 </style>
 </head>
 <body>
@@ -415,13 +437,15 @@
     </div>
     
     <div class="recipe-container">
-      <h4>Recipe Library</h4>
+      <div class="recipe-header">
+        <h4>Recipe Library</h4>
+        <button class="btn btn-sm add-recipe-btn" id="add-recipe-btn">
+          <i class="fas fa-plus me-2"></i>Add Custom Recipe
+        </button>
+      </div>
       <div class="recipe-list" id="recipe-library">
         <!-- Recipe cards will be filled by JavaScript -->
       </div>
-      <button class="btn btn-sm add-recipe-btn" id="add-recipe-btn">
-        <i class="fas fa-plus"></i> Add Custom Recipe
-      </button>
     </div>
   </div>
 
