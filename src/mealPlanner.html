@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meal Planning Calendar with Recipes</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #FF6B6B;
+      --secondary: #4ECDC4;
+      --accent: #FFE66D;
+      --dark: #2D3047;
+      --light: #FFFFFF;
+      --background: #FAFAFA;
+      --breakfast: #4285F4;
+      --lunch: #0F9D58;
+      --dinner: #DB4437;
+      --snack: #F4B400;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--light);
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    .calendar-container {
+      max-width: 1600px; /* Increased from 1200px */
+      margin: 100px auto 20px;
+      padding: 0 15px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .calendar-header h2 {
+      color: var(--dark);
+      font-weight: 700;
+    }
+
+    .days-header {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background-color: var(--background);
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1rem;
+    }
+
+    .day-name {
+      padding: 1rem;
+      text-align: center;
+      color: var(--primary);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .week {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .day {
+      background: var(--background);
+      border-radius: 1rem;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .day:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .current-day {
+      background: var(--primary);
+      color: white;
+    }
+
+    .current-day .day-number {
+      color: white;
+    }
+
+    .day-number {
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+    }
+
+    .meal-slot {
+      background: var(--background);
+      border-radius: 0.75rem;
+      padding: 0;  /* Removed padding */
+      margin-bottom: 1rem;
+      border: none; /* Removed dotted border */
+      transition: all 0.2s ease;
+      min-height: 180px; /* Increased height */
+      display: flex;
+      flex-direction: column;
+      overflow: hidden; /* Keep content within borders */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Added subtle shadow */
+    }
+
+    .meal-slot-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      padding: 0.75rem; /* Added padding to header */
+      background: rgba(255, 255, 255, 0.9); /* Added semi-transparent background */
+    }
+
+    .meal-slot.breakfast { 
+      border-color: var(--breakfast); 
+    }
+    .meal-slot.lunch { 
+      border-color: var(--lunch); 
+    }
+    .meal-slot.dinner { 
+      border-color: var(--dinner); 
+    }
+    .meal-slot.snack { 
+      border-color: var(--snack); 
+    }
+
+    .meal-slot.drop-hover {
+      background: rgba(245, 245, 245, 0.8);
+      border-style: solid;
+    }
+
+    .meal-title {
+      color: var(--dark);
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+
+    .meal-time {
+      color: var(--dark);
+      opacity: 0.7;
+      font-size: 0.8em;
+    }
+
+    .meal-placeholder-image {
+      width: 100%;
+      height: 120px; /* Increased height */
+      background-color: #f0f0f0;
+      border-radius: 0; /* Removed border radius */
+      margin: 0; /* Removed margin */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+    }
+
+    .recipe-container {
+      margin-top: 2rem;
+      padding-top: 2rem;
+    }
+
+    .recipe-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .recipe-card {
+      background: var(--light);
+      border-radius: 1rem;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      border: none;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .recipe-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .recipe-card img {
+      border-radius: 0.75rem;
+      height: 160px;
+      width: 100%;
+      object-fit: cover;
+      margin-bottom: 0.75rem;
+    }
+
+    .recipe-title {
+      color: var(--dark);
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .recipe-time {
+      color: var(--secondary);
+      font-weight: 500;
+      margin-top: auto;
+    }
+
+    /* Styling for recipes in meal slots */
+    .recipe-in-slot {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+      position: relative;
+    }
+
+    .recipe-in-slot img {
+      border-radius: 0; /* Removed border radius from images */
+      height: 120px; /* Increased height */
+      width: 100%;
+      object-fit: cover;
+      margin-bottom: 0;
+    }
+
+    .recipe-in-slot .recipe-title {
+      font-size: 0.95em;
+      margin-bottom: 0.5rem;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.9);
+      margin-bottom: 0;
+    }
+
+    .recipe-in-slot .recipe-time {
+      font-size: 0.85em;
+      margin-top: auto;
+      padding: 0.5rem 0.75rem;
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .remove-recipe {
+      position: absolute;
+      top: 0;
+      right: 0;
+      cursor: pointer;
+      color: var(--primary);
+      font-size: 0.8em;
+      background: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      line-height: 20px;
+      z-index: 10;
+    }
+
+    .btn-nav {
+      background: var(--primary);
+      color: white;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-nav:hover {
+      background: var(--secondary);
+      transform: scale(1.05);
+    }
+
+    .add-recipe-btn {
+      background: var(--accent);
+      color: var(--dark);
+      font-weight: 600;
+      border: none;
+    }
+
+    .modal-content {
+      border-radius: 1.5rem;
+      border: none;
+    }
+
+    .nutrition-grid {
+      background: var(--background);
+      border-radius: 1rem;
+      padding: 1rem;
+    }
+
+    [data-bs-theme="dark"] .day {
+      background: rgba(45, 48, 71, 0.9);
+      color: white;
+    }
+
+    [data-bs-theme="dark"] .recipe-card {
+      background: var(--dark);
+      color: white;
+    }
+
+    [data-bs-theme="dark"] .meal-title,
+    [data-bs-theme="dark"] .meal-time {
+      color: white;
+    }
+
+    [data-bs-theme="dark"] .meal-slot-header,
+    [data-bs-theme="dark"] .recipe-in-slot .recipe-title,
+    [data-bs-theme="dark"] .recipe-in-slot .recipe-time {
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    /* Meal legend styles */
+    .meal-legend {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      background: var(--background);
+      padding: 1rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .color-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    
+    .color-box.breakfast {
+      background-color: var(--breakfast);
+    }
+    
+    .color-box.lunch {
+      background-color: var(--lunch);
+    }
+    
+    .color-box.dinner {
+      background-color: var(--dinner);
+    }
+    
+    .color-box.snack {
+      background-color: var(--snack);
+    }
+
+    @media (max-width: 768px) {
+      .calendar-container {
+        margin-top: 80px;
+      }
+      
+      .week {
+        grid-template-columns: 1fr;
+      }
+      
+      .day {
+        min-height: auto;
+      }
+
+      .meal-legend {
+        flex-wrap: wrap;
+        justify-content: space-around;
+      }
+    }
+</style>
+</head>
+<body>
+  <div class="calendar-container">
+    <div class="calendar-header">
+      <h2>Meal Planning Calendar</h2>
+      <div class="btn-group">
+        <button id="prev-week" class="btn btn-nav">&lt;</button>
+        <button id="today" class="btn btn-outline-primary mx-2">Today</button>
+        <button id="next-week" class="btn btn-nav">&gt;</button>
+      </div>
+    </div>
+    
+    <div class="meal-legend">
+      <div class="legend-item">
+        <div class="color-box breakfast"></div>
+        <span>Breakfast</span>
+      </div>
+      <div class="legend-item">
+        <div class="color-box lunch"></div>
+        <span>Lunch</span>
+      </div>
+      <div class="legend-item">
+        <div class="color-box dinner"></div>
+        <span>Dinner</span>
+      </div>
+      <div class="legend-item">
+        <div class="color-box snack"></div>
+        <span>Snacks</span>
+      </div>
+    </div>
+    
+    <div id="calendar-title" class="text-center mb-3 h4"></div>
+    
+    <div class="days-header" id="days-header">
+      <!-- Day names will be filled by JavaScript -->
+    </div>
+    
+    <div id="calendar-body">
+      <!-- Calendar weeks and days will be filled by JavaScript -->
+    </div>
+    
+    <div class="recipe-container">
+      <h4>Recipe Library</h4>
+      <div class="recipe-list" id="recipe-library">
+        <!-- Recipe cards will be filled by JavaScript -->
+      </div>
+      <button class="btn btn-sm add-recipe-btn" id="add-recipe-btn">
+        <i class="fas fa-plus"></i> Add Custom Recipe
+      </button>
+    </div>
+  </div>
+
+  <!-- Custom Recipe Modal -->
+  <div class="modal fade" id="recipeModal" tabindex="-1" aria-labelledby="recipeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="recipeModalLabel">Add Custom Recipe</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="recipeForm">
+            <div class="mb-3">
+              <label for="recipeName" class="form-label">Recipe Name</label>
+              <input type="text" class="form-control" id="recipeName" required>
+            </div>
+            <div class="mb-3">
+              <label for="recipeTime" class="form-label">Prep Time (minutes)</label>
+              <input type="number" class="form-control" id="recipeTime" min="1" value="30">
+            </div>
+            <div class="mb-3">
+              <label for="recipeType" class="form-label">Best For</label>
+              <select class="form-select" id="recipeType">
+                <option value="any">Any Meal</option>
+                <option value="breakfast">Breakfast</option>
+                <option value="lunch">Lunch</option>
+                <option value="dinner">Dinner</option>
+                <option value="snack">Snack</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveRecipe">Save Recipe</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      
+      let currentDate = new Date();
+      let currentWeekStart = getMonday(currentDate);
+      
+      // Sample recipes data
+      const sampleRecipes = [
+        { id: 1, name: 'Avocado Toast', time: 15, image: 'https://alegumeaday.com/wp-content/uploads/2024/03/Bean-avocado-toast-1.jpg', type: 'breakfast' },
+        { id: 2, name: 'Greek Yogurt with Berries', time: 5, image: '/api/placeholder/150/80', type: 'breakfast' },
+        { id: 3, name: 'Chicken Salad', time: 20, image: '/api/placeholder/150/80', type: 'lunch' },
+        { id: 4, name: 'Quinoa Bowl', time: 25, image: '/api/placeholder/150/80', type: 'lunch' },
+        { id: 5, name: 'Salmon with Veggies', time: 30, image: '/api/placeholder/150/80', type: 'dinner' },
+        { id: 6, name: 'Pasta Primavera', time: 35, image: '/api/placeholder/150/80', type: 'dinner' },
+        { id: 7, name: 'Hummus & Carrots', time: 5, image: '/api/placeholder/150/80', type: 'snack' },
+        { id: 8, name: 'Apple with Peanut Butter', time: 5, image: '/api/placeholder/150/80', type: 'snack' }
+      ];
+      
+      // Meal type to image mapping
+      const mealTypeImages = {
+        'breakfast': '/api/placeholder/150/80?text=Breakfast',
+        'lunch': '/api/placeholder/150/80?text=Lunch',
+        'dinner': '/api/placeholder/150/80?text=Dinner',
+        'snack': '/api/placeholder/150/80?text=Snack'
+      };
+      
+      // Saved meal plans (empty initially)
+      let savedMealPlans = {};
+      
+      // Find or create modal
+      let recipeModal = new bootstrap.Modal(document.getElementById('recipeModal'));
+      
+      // Event listeners for navigation buttons
+      document.getElementById('prev-week').addEventListener('click', function() {
+        currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+        renderCalendar();
+      });
+      
+      document.getElementById('next-week').addEventListener('click', function() {
+        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+        renderCalendar();
+      });
+      
+      document.getElementById('today').addEventListener('click', function() {
+        currentDate = new Date();
+        currentWeekStart = getMonday(currentDate);
+        renderCalendar();
+      });
+      
+      // Event listener for adding new recipe
+      document.getElementById('add-recipe-btn').addEventListener('click', function() {
+        recipeModal.show();
+      });
+      
+      // Event listener for saving new recipe
+      document.getElementById('saveRecipe').addEventListener('click', function() {
+        const name = document.getElementById('recipeName').value;
+        const time = parseInt(document.getElementById('recipeTime').value);
+        const type = document.getElementById('recipeType').value;
+        
+        if (name) {
+          const newId = sampleRecipes.length > 0 ? Math.max(...sampleRecipes.map(r => r.id)) + 1 : 1;
+          
+          const newRecipe = {
+            id: newId,
+            name: name,
+            time: time,
+            image: type !== 'any' ? mealTypeImages[type] : '/api/placeholder/150/80',
+            type: type === 'any' ? 'all' : type
+          };
+          
+          sampleRecipes.push(newRecipe);
+          renderRecipeLibrary();
+          recipeModal.hide();
+          
+          // Reset form
+          document.getElementById('recipeForm').reset();
+        }
+      });
+      
+      // Get Monday of the current week
+      function getMonday(date) {
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust for Sunday
+        return new Date(date.setDate(diff));
+      }
+      
+      // Format time in 24-hour format
+      function formatTime(hours, minutes) {
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+      }
+      
+      // Get meal slots for a day
+      function getMealSlotsForDay(date) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const day = date.getDate();
+        const dateKey = `${year}-${month+1}-${day}`;
+        
+        return [
+          {
+            type: 'breakfast',
+            name: 'Breakfast',
+            time: formatTime(7, 0),
+            id: `${dateKey}-breakfast`
+          },
+          {
+            type: 'lunch',
+            name: 'Lunch',
+            time: formatTime(12, 0),
+            id: `${dateKey}-lunch`
+          },
+          {
+            type: 'snack',
+            name: 'Snack',
+            time: formatTime(15, 30),
+            id: `${dateKey}-snack`
+          },
+          {
+            type: 'dinner',
+            name: 'Dinner',
+            time: formatTime(19, 0),
+            id: `${dateKey}-dinner`
+          }
+        ];
+      }
+      
+      // Check if a date is today
+      function isToday(date) {
+        const today = new Date();
+        return date.getDate() === today.getDate() &&
+               date.getMonth() === today.getMonth() &&
+               date.getFullYear() === today.getFullYear();
+      }
+      
+      // Render calendar header (days of week)
+      function renderCalendarHeader() {
+        const headerEl = document.getElementById('days-header');
+        headerEl.innerHTML = '';
+        
+        dayNames.forEach(day => {
+          const dayEl = document.createElement('div');
+          dayEl.className = 'day-name';
+          dayEl.textContent = day;
+          headerEl.appendChild(dayEl);
+        });
+      }
+      
+      // Render calendar title (month and year)
+      function renderCalendarTitle() {
+        const endOfWeek = new Date(currentWeekStart);
+        endOfWeek.setDate(endOfWeek.getDate() + 6);
+        
+        let title = `${monthNames[currentWeekStart.getMonth()]} ${currentWeekStart.getFullYear()}`;
+        
+        // If week spans two months
+        if (currentWeekStart.getMonth() !== endOfWeek.getMonth()) {
+          title = `${monthNames[currentWeekStart.getMonth()]} - ${monthNames[endOfWeek.getMonth()]} ${endOfWeek.getFullYear()}`;
+        }
+        
+        // If week spans two years
+        if (currentWeekStart.getFullYear() !== endOfWeek.getFullYear()) {
+          title = `${monthNames[currentWeekStart.getMonth()]} ${currentWeekStart.getFullYear()} - ${monthNames[endOfWeek.getMonth()]} ${endOfWeek.getFullYear()}`;
+        }
+        
+        document.getElementById('calendar-title').textContent = title;
+      }
+      
+      // Render a single week
+      function renderWeek() {
+        const calendarBody = document.getElementById('calendar-body');
+        calendarBody.innerHTML = '';
+        
+        const weekEl = document.createElement('div');
+        weekEl.className = 'week';
+        
+        // Create 7 days starting from Monday
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(currentWeekStart);
+          date.setDate(date.getDate() + i);
+          
+          const dayEl = document.createElement('div');
+          dayEl.className = 'day';
+          if (isToday(date)) {
+            dayEl.classList.add('current-day');
+          }
+          
+          // Day number
+          const dayNumber = document.createElement('div');
+          dayNumber.className = 'day-number';
+          dayNumber.textContent = date.getDate();
+          dayEl.appendChild(dayNumber);
+          
+          // Add meal slots
+          const mealSlots = getMealSlotsForDay(date);
+          mealSlots.forEach(meal => {
+            const mealEl = document.createElement('div');
+            mealEl.className = `meal-slot ${meal.type}`;
+            mealEl.id = meal.id;
+            
+            // Create meal header with title and time
+            const mealHeader = document.createElement('div');
+            mealHeader.className = 'meal-slot-header';
+            mealHeader.innerHTML = `
+              <div class="meal-title">${meal.name}</div>
+              <div class="meal-time">${meal.time}</div>
+            `;
+            
+            // Add placeholder image for empty meal slots
+            const placeholderImg = document.createElement('div');
+            placeholderImg.className = 'meal-placeholder-image';
+            placeholderImg.innerHTML = `<i class="fas fa-utensils"></i>`;
+            
+            mealEl.appendChild(mealHeader);
+            mealEl.appendChild(placeholderImg);
+            
+            // Make slot a drop target
+            mealEl.addEventListener('dragover', handleDragOver);
+            mealEl.addEventListener('dragenter', handleDragEnter);
+            mealEl.addEventListener('dragleave', handleDragLeave);
+            mealEl.addEventListener('drop', handleDrop);
+            
+            // Check if there's a saved recipe for this slot
+            if (savedMealPlans[meal.id]) {
+              addRecipeToSlot(savedMealPlans[meal.id], mealEl);
+            }
+            
+            dayEl.appendChild(mealEl);
+          });
+          
+          weekEl.appendChild(dayEl);
+        }
+        
+        calendarBody.appendChild(weekEl);
+      }
+      
+      // Add a recipe to a meal slot
+      function addRecipeToSlot(recipe, slotElement) {
+        const recipeEl = document.createElement('div');
+        recipeEl.className = 'recipe-in-slot';
+        recipeEl.innerHTML = `
+          <div class="remove-recipe"><i class="fas fa-times"></i></div>
+          <img src="${recipe.image}" alt="${recipe.name}">
+          <div class="recipe-title">${recipe.name}</div>
+          <div class="recipe-time">${recipe.time} min</div>
+        `;
+        
+        // Add remove button functionality
+        recipeEl.querySelector('.remove-recipe').addEventListener('click', function(e) {
+          e.stopPropagation();
+          delete savedMealPlans[slotElement.id];
+          
+          // Get meal type and recreate the empty slot
+          const mealType = slotElement.id.split('-').pop();
+          const mealTime = getMealSlotsForDay(new Date())[['breakfast', 'lunch', 'snack', 'dinner'].indexOf(mealType)].time;
+          
+          slotElement.innerHTML = '';
+          
+          // Recreate meal header
+          const mealHeader = document.createElement('div');
+          mealHeader.className = 'meal-slot-header';
+          mealHeader.innerHTML = `
+            <div class="meal-title">${mealType.charAt(0).toUpperCase() + mealType.slice(1)}</div>
+            <div class="meal-time">${mealTime}</div>
+          `;
+          
+          // Add placeholder image
+          const placeholderImg = document.createElement('div');
+          placeholderImg.className = 'meal-placeholder-image';
+          placeholderImg.innerHTML = `<i class="fas fa-utensils"></i>`;
+          
+          slotElement.appendChild(mealHeader);
+          slotElement.appendChild(placeholderImg);
+        });
+        
+        // Make draggable for moving
+        recipeEl.draggable = true;
+        recipeEl.addEventListener('dragstart', function(e) {
+          e.dataTransfer.setData('text/plain', JSON.stringify(recipe));
+          e.dataTransfer.setData('sourceSlot', slotElement.id);
+        });
+        
+        // Clear slot content and add recipe
+        slotElement.innerHTML = '';
+        slotElement.appendChild(recipeEl);
+      }
+      
+      // Render recipe library
+      function renderRecipeLibrary() {
+        const libraryEl = document.getElementById('recipe-library');
+        libraryEl.innerHTML = '';
+        
+        sampleRecipes.forEach(recipe => {
+          const recipeEl = document.createElement('div');
+          recipeEl.className = 'recipe-card';
+          recipeEl.draggable = true;
+          recipeEl.innerHTML = `
+            <img src="${recipe.image}" alt="${recipe.name}">
+            <div class="recipe-title">${recipe.name}</div>
+            <div class="recipe-time">${recipe.time} min</div>
+          `;
+          
+          // Make draggable
+          recipeEl.addEventListener('dragstart', function(e) {
+            e.dataTransfer.setData('text/plain', JSON.stringify(recipe));
+          });
+          
+          libraryEl.appendChild(recipeEl);
+        });
+      }
+      
+      // Drag and drop handlers
+      function handleDragOver(e) {
+        e.preventDefault();
+      }
+      
+      function handleDragEnter(e) {
+        e.preventDefault();
+        this.classList.add('drop-hover');
+      }
+      
+      function handleDragLeave(e) {
+        this.classList.remove('drop-hover');
+      }
+      
+      function handleDrop(e) {
+        e.preventDefault();
+        this.classList.remove('drop-hover');
+        
+        // Get recipe data
+        const recipeData = JSON.parse(e.dataTransfer.getData('text/plain'));
+        const sourceSlotId = e.dataTransfer.getData('sourceSlot');
+        
+        // If moving from another slot, clear that slot
+        if (sourceSlotId) {
+          delete savedMealPlans[sourceSlotId];
+          const sourceSlot = document.getElementById(sourceSlotId);
+          if (sourceSlot) {
+            const mealType = sourceSlotId.split('-').pop();
+            const mealTime = getMealSlotsForDay(new Date())[['breakfast', 'lunch', 'snack', 'dinner'].indexOf(mealType)].time;
+            
+            sourceSlot.innerHTML = '';
+            
+            // Recreate meal header
+            const mealHeader = document.createElement('div');
+            mealHeader.className = 'meal-slot-header';
+            mealHeader.innerHTML = `
+              <div class="meal-title">${mealType.charAt(0).toUpperCase() + mealType.slice(1)}</div>
+              <div class="meal-time">${mealTime}</div>
+            `;
+            
+            // Add placeholder image
+            const placeholderImg = document.createElement('div');
+            placeholderImg.className = 'meal-placeholder-image';
+            placeholderImg.innerHTML = `<i class="fas fa-utensils"></i>`;
+            
+            sourceSlot.appendChild(mealHeader);
+            sourceSlot.appendChild(placeholderImg);
+          }
+        }
+        
+        // Save to meal plans
+        savedMealPlans[this.id] = recipeData;
+        
+        // Add recipe to slot
+        addRecipeToSlot(recipeData, this);
+      }
+      
+      // Main function to render calendar
+      function renderCalendar() {
+        renderCalendarHeader();
+        renderCalendarTitle();
+        renderWeek();
+      }
+      
+      // Initial render
+      renderCalendar();
+      renderRecipeLibrary();
+    });
+  </script>
+</body>
+</html>

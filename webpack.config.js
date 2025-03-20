@@ -26,6 +26,10 @@ module.exports = {
       template: './src/login.html', // Specify the location of your HTML file
       filename: 'login.html' // Specify the output filename
     }),
+    new HtmlWebpackPlugin({
+      template: './src/mealPlanner.html', // Specify the location of your HTML file
+      filename: 'mealPlanner.html' // Specify the output filename
+    }),
     new Dotenv()
   ],
 };
